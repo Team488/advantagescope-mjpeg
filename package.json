@@ -1,0 +1,182 @@
+{
+  "name": "advantagescope",
+  "productName": "AdvantageScope",
+  "version": "3.2.1",
+  "description": "Robot telemetry application for FRC",
+  "author": {
+    "name": "FRC 6328",
+    "email": "info@littletonrobotics.org",
+    "url": "https://littletonrobotics.org"
+  },
+  "license": "MIT",
+  "main": "bundles/main.js",
+  "scripts": {
+    "start": "electron bundles/main.js --trace-warnings",
+    "compile": "rollup -c --configMain && rollup -c --configLargeRenderers && rollup -c --configSmallRenderers && rollup -c --configWorkers",
+    "build": "npm run compile && electron-builder build",
+    "fast-build": "npm run compile && electron-builder build --dir",
+    "watch": "rollup -c -w",
+    "format": "prettier --write .",
+    "check-format": "prettier --check .",
+    "test-ytdl": "node testYtdl.mjs",
+    "postinstall": "node getLicenses.mjs && node ffmpegDownload.mjs && node tesseractLangDownload.mjs"
+  },
+  "devDependencies": {
+    "@electron/notarize": "^2.1.0",
+    "@mcap/core": "^1.3.0",
+    "@msgpack/msgpack": "^3.0.0-beta2",
+    "@rollup/plugin-commonjs": "^25.0.4",
+    "@rollup/plugin-json": "^6.0.0",
+    "@rollup/plugin-node-resolve": "^15.2.1",
+    "@rollup/plugin-replace": "^5.0.2",
+    "@rollup/plugin-typescript": "11.1.3",
+    "@types/chart.js": "^2.9.38",
+    "@types/download": "^8.0.2",
+    "@types/express": "^5.0.0",
+    "@types/heatmap.js": "2.0.38",
+    "@types/jsonfile": "^6.1.2",
+    "@types/remarkable": "^2.0.3",
+    "@types/ssh2": "^1.11.13",
+    "@types/three": "^0.156.0",
+    "chart.js": "^4.4.0",
+    "electron": "^26.2.1",
+    "electron-builder": "^24.6.4",
+    "fuse.js": "^7.0.0",
+    "heatmap.js": "https://github.com/jwbonner/heatmap.js.git",
+    "highlight.js": "^11.9.0",
+    "mathjs": "11.3.0",
+    "node-fetch": "^3.3.2",
+    "prettier": "3.0.3",
+    "protobufjs": "^7.2.5",
+    "remarkable": "^2.0.1",
+    "rollup": "^3.29.2",
+    "rollup-plugin-cleanup": "^3.2.1",
+    "rollup-plugin-re": "^1.0.7",
+    "simple-statistics": "^7.8.3",
+    "three": "^0.156.1",
+    "tslib": "^2.6.2",
+    "typescript": "5.2.2"
+  },
+  "dependencies": {
+    "check-disk-space": "^3.4.0",
+    "download": "^8.0.0",
+    "electron-fetch": "^1.9.1",
+    "express": "^4.21.1",
+    "jsonfile": "^6.1.0",
+    "ssh2": "^1.14.0",
+    "tesseract.js": "^5.0.3",
+    "ytdl-core": "https://github.com/khlevon/node-ytdl-core.git#v4.11.5-patch.2"
+  },
+  "prettier": {
+    "printWidth": 120,
+    "trailingComma": "none"
+  },
+  "build": {
+    "appId": "org.littletonrobotics.advantagescope",
+    "copyright": "Copyright © 2021-2024 FRC 6328",
+    "npmRebuild": false,
+    "publish": [],
+    "afterSign": "notarize.js",
+    "files": [
+      "www/**/*",
+      "bundles/*",
+      "icons/**/*",
+      "!icons/**/*.iconset",
+      "bundledAssets/**/*",
+      "docs/**/*",
+      "!**/.*"
+    ],
+    "extraResources": [
+      {
+        "from": "ffmpeg",
+        "filter": [
+          "ffmpeg-${os}-${arch}*"
+        ]
+      },
+      "LICENSE",
+      "ThirdPartyLicenses.txt",
+      "eng.traineddata.gz"
+    ],
+    "fileAssociations": [
+      {
+        "ext": "wpilog",
+        "name": "WPILib robot log",
+        "description": "WPILib robot log",
+        "mimeType": "application/x-wpilog",
+        "role": "Viewer",
+        "icon": "icons/app/wpilog-icon"
+      },
+      {
+        "ext": "rlog",
+        "name": "Robot log",
+        "description": "Robot log",
+        "mimeType": "application/x-rlog",
+        "role": "Viewer",
+        "icon": "icons/app/rlog-icon"
+      },
+      {
+        "ext": "dslog",
+        "name": "FRC Driver Station log",
+        "description": "FRC Driver Station log",
+        "mimeType": "application/x-dslog",
+        "role": "Viewer",
+        "icon": "icons/app/dslog-icon"
+      },
+      {
+        "ext": "dsevents",
+        "name": "FRC Driver Station events",
+        "description": "FRC Driver Station events",
+        "mimeType": "application/x-dsevents",
+        "role": "Viewer",
+        "icon": "icons/app/dsevents-icon"
+      },
+      {
+        "ext": "hoot",
+        "name": "Hoot robot log",
+        "description": "Hoot robot log",
+        "mimeType": "application/x-hoot",
+        "role": "Viewer",
+        "icon": "icons/app/hoot-icon"
+      }
+    ],
+    "mac": {
+      "target": "dmg",
+      "icon": "icons/app/app-icon.icns",
+      "entitlements": "entitlements.mac.plist",
+      "entitlementsInherit": "entitlements.mac.plist",
+      "extendInfo": {
+        "NSUpdateSecurityPolicy": {
+          "AllowPackages": [
+            "58SET3NSX7"
+          ],
+          "AllowProcesses": {
+            "58SET3NSX7": [
+              "WPILibInstaller"
+            ]
+          }
+        }
+      },
+      "notarize": false
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "snap",
+        "flatpak",
+        "deb",
+        "rpm",
+        "pacman"
+      ],
+      "icon": "icons/app/app-icons-linux",
+      "category": "Utility"
+    },
+    "flatpak": {
+      "runtimeVersion": "22.08",
+      "baseVersion": "22.08"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "icons/app/app-icon.ico"
+    }
+  }
+}
