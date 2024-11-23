@@ -162,7 +162,7 @@ export default class ThreeDimensionVisualizer implements Visualizer {
 
     // Create camera
     {
-      const aspect = 2;
+      const aspect = this.canvas.width / this.canvas.height;
       const near = 0.15;
       const far = 1000;
       this.camera = new THREE.PerspectiveCamera(this.cameraConfig.fov, aspect, near, far);
@@ -1327,11 +1327,10 @@ export default class ThreeDimensionVisualizer implements Visualizer {
     // Set camera for fixed views
 
     this.canvas.classList.add("fixed");
-    let aspectRatio = 16 / 9;
+    let aspectRatio = this.canvas.width / this.canvas.height;;
     if (robotConfig) {
       // Get fixed aspect ratio and FOV
       let cameraConfig = this.cameraConfig;
-      aspectRatio = cameraConfig.resolution[0] / cameraConfig.resolution[1];
       this.lastAspectRatio = aspectRatio;
       let fov = cameraConfig.fov / aspectRatio;
       this.canvas.style.width = "100%";
