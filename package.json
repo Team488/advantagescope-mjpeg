@@ -11,7 +11,7 @@
   "license": "MIT",
   "main": "bundles/main.js",
   "scripts": {
-    "start": "electron bundles/main.js --trace-warnings --enable-gpu --enable-webgl --ignore-gpu-blacklist --disable-software-rasterizer",
+    "start": "electron bundles/main.js --trace-warnings --enable-gpu --enable-webgl --ignore-gpu-blacklist",
     "compile": "rollup -c --configMain && rollup -c --configLargeRenderers && rollup -c --configSmallRenderers && rollup -c --configWorkers",
     "build": "npm run compile && electron-builder build",
     "fast-build": "npm run compile && electron-builder build --dir",

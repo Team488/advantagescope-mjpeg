@@ -40,7 +40,7 @@ export default abstract class TimelineVizController implements TabController {
   private lastAllKeys: string[] = [];
   private periodicInterval: number;
   protected visualizer: Visualizer;
-  private streamVisualizers: ThreeDimensionVisualizerSimulation[] = [];
+  private simulationVisualizer: ThreeDimensionVisualizerSimulation;
   private lastStreamVisualizerNames: string[] = [];
 
   constructor(
@@ -153,14 +153,10 @@ export default abstract class TimelineVizController implements TabController {
         window.electronAPI.log("Not Creating stream visualizers");
         return;
       }
-      this.streamVisualizers = [];
       window.electronAPI.log("Creating stream visualizers");
       // create new visualizers
 
-      robotConfig.cameras.forEach((camera, index) => {
-        let newVisualizer = new ThreeDimensionVisualizerSimulation("standard", camera, robotConfig);
-        this.streamVisualizers.push(newVisualizer);
-      });
+      this.simulationVisualizer = new ThreeDimensionVisualizerSimulation("standard", robotConfig, robotConfig.cameras)
       window.electronAPI.updateNetworkStreamNames(names);
     } catch (error) {
       window.electronAPI.log("Failing to create stream visualizers!\n" + error);
@@ -511,9 +507,7 @@ export default abstract class TimelineVizController implements TabController {
 
     // Update visualizers
     if (!this.CONTENT.hidden) this.visualizer.render(command);
-    for (let visualizer of this.streamVisualizers) {
-      visualizer.render(command);
-    }
+    this.simulationVisualizer.render(command);
 
     window.sendMainMessage("update-satellite", {
       uuid: this.UUID,

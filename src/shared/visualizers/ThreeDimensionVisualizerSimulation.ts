@@ -28,6 +28,7 @@ import { MechanismState } from "../log/LogUtil";
 import { convert } from "../units";
 import { clampValue, zfill } from "../util";
 import Visualizer from "./Visualizer";
+import { config } from "mathjs";
 
 export default class ThreeDimensionVisualizer implements Visualizer {
   static GHOST_COLORS = ["Green", "Yellow", "Blue", "Red"];
@@ -86,8 +87,8 @@ export default class ThreeDimensionVisualizer implements Visualizer {
   private fixedCameraOverrideObj: THREE.Object3D;
   private dsCameraGroup: THREE.Group;
   private dsCameraObj: THREE.Object3D;
-  private name: string;
-  private cameraConfig: Config3dRobot_Camera;
+  private names: string[];
+  private cameraConfigs: Config3dRobot_Camera[];
   private robotConfig: Config3dRobot;
 
   private axesTemplate: THREE.Object3D;
@@ -123,20 +124,21 @@ export default class ThreeDimensionVisualizer implements Visualizer {
   private lastAssetsString: string = "";
   private lastFieldTitle: string = "";
   private lastRobotTitle: string = "";
-  private lastRender: HTMLCanvasElement;
+  private lastRenders: HTMLCanvasElement[];
 
 
   constructor(
-    mode: "cinematic" | "standard" | "low-power", cameraConfig: Config3dRobot_Camera, robotConfig: any
+    mode: "cinematic" | "standard" | "low-power", robotConfig: any, cameraConfigs: Config3dRobot_Camera[],
   ) {
-    this.name = cameraConfig.name;
+    this.names = cameraConfigs.map((config) => config.name);
     this.mode = mode;
-    this.cameraConfig = cameraConfig;
+    this.cameraConfigs = cameraConfigs;
     this.robotConfig = robotConfig;
     this.canvas = document.createElement("canvas");
-    this.canvas.width = cameraConfig.resolution[0]
-    this.canvas.height = cameraConfig.resolution[1]
-    this.lastRender = this.canvas
+    // NOTE the render size will be dependent on size of the first camera config, not an issue since all cameras are 640x480
+    this.canvas.width = cameraConfigs[0].resolution[0]
+    this.canvas.height = cameraConfigs[0].resolution[1]
+    this.lastRenders = new Array(cameraConfigs.length)
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.canvas,
       powerPreference: mode === "cinematic" ? "high-performance" : mode === "low-power" ? "low-power" : "default"
@@ -165,7 +167,8 @@ export default class ThreeDimensionVisualizer implements Visualizer {
       const aspect = this.canvas.width / this.canvas.height;
       const near = 0.15;
       const far = 1000;
-      this.camera = new THREE.PerspectiveCamera(this.cameraConfig.fov, aspect, near, far);
+      // NOTE, also using the first cameras FOV here (no need to create multiple cameras if all cameras have the same fov anyways)
+      this.camera = new THREE.PerspectiveCamera(this.cameraConfigs[0].fov, aspect, near, far);
     }
 
     // Create controls
@@ -532,31 +535,37 @@ export default class ThreeDimensionVisualizer implements Visualizer {
     }
 
     // sending to mjpeg stream
-    try {
-      // console.log("Sending render");
+    this.names.forEach((name, index) => {
+      try {
+        if (this.lastRenders[index] != null) {
+          // console.log("Sending render");
 
-      const newCanvas = document.createElement("canvas");
-      newCanvas.width = this.renderer.domElement.width;
-      newCanvas.height = this.renderer.domElement.height;
+          const newCanvas = document.createElement("canvas");
+          newCanvas.width = this.renderer.domElement.width;
+          newCanvas.height = this.renderer.domElement.height;
 
-      // Get the 2D context of the new canvas
-      const newctx = newCanvas.getContext("2d");
+          // Get the 2D context of the new canvas
+          const newctx = newCanvas.getContext("2d");
 
-      // Fill the new canvas with a black background
-      if (newctx != null) newctx.fillStyle = "green";
-      newctx?.fillRect(0, 0, newCanvas.width, newCanvas.height);
-      // console.log("Width: " + newCanvas.width + " height" + newCanvas.height)
-      // newctx?.fillText("AAAAAAAAAA", 30, 30, 2);
-      // Draw the original canvas content onto the new canvas
-      newctx?.drawImage(this.renderer.domElement, 0, 0);
-      // console.log("Sending frame!!");
-      const dataUrl = newCanvas.toDataURL("image/jpeg"); // Data URL
-      const base64Data = dataUrl.split(",")[1]; // Extract the base64 string
-      // window.electronAPI.log("Sending b64: " + base64Data);
-      window.electronAPI.sendFrameToMain(this.name, base64Data); // Send byte array
-    } catch (error) {
-      console.log("Error preprocessing canvas!\n" + error);
-    }
+          // Fill the new canvas with a black background
+          if (newctx != null) newctx.fillStyle = "green";
+          newctx?.fillRect(0, 0, newCanvas.width, newCanvas.height);
+          // console.log("Width: " + newCanvas.width + " height" + newCanvas.height)
+          // newctx?.fillText("AAAAAAAAAA", 30, 30, 2);
+          // Draw the original canvas content onto the new canvas
+          newctx?.drawImage(this.lastRenders[index], 0, 0);
+          // console.log("Sending frame!!");
+          const dataUrl = newCanvas.toDataURL("image/jpeg"); // Data URL
+          const base64Data = dataUrl.split(",")[1]; // Extract the base64 string
+          // window.electronAPI.log("Sending b64: " + base64Data);
+          window.electronAPI.sendFrameToMain(name, base64Data); // Send byte array
+        }
+
+      } catch (error) {
+        console.log("Error preprocessing canvas!\n" + error);
+      }
+
+    });
 
     // Exit if no command is set
     if (!this.command) {
@@ -1324,73 +1333,74 @@ export default class ThreeDimensionVisualizer implements Visualizer {
       }
     });
 
-    // Set camera for fixed views
+    // Set camera positions
+    this.cameraConfigs.forEach((config, index) => {
+      let aspectRatio = this.canvas.width / this.canvas.height;;
+      if (robotConfig) {
+        // Get fixed aspect ratio and FOV
+        this.lastAspectRatio = aspectRatio;
+        let fov = config.fov / aspectRatio;
+        this.canvas.style.width = "100%";
+        this.canvas.style.height = "100%";
 
-    this.canvas.classList.add("fixed");
-    let aspectRatio = this.canvas.width / this.canvas.height;;
-    if (robotConfig) {
-      // Get fixed aspect ratio and FOV
-      let cameraConfig = this.cameraConfig;
-      this.lastAspectRatio = aspectRatio;
-      let fov = cameraConfig.fov / aspectRatio;
-      this.canvas.style.width = "100%";
-      this.canvas.style.height = "100%";
+        // Update camera position
+        let referenceObj: THREE.Object3D | null = null;
+        if (this.command.poses.cameraOverride.length > 0) {
+          let cameraPose: Pose3d = this.command.poses.cameraOverride[0];
+          this.fixedCameraOverrideObj.position.set(...cameraPose.translation);
+          this.fixedCameraOverrideObj.rotation.setFromQuaternion(
+            rotation3dToQuaternion(cameraPose.rotation).multiply(this.CAMERA_ROTATION)
+          );
+          referenceObj = this.fixedCameraOverrideObj;
+        } else if (this.command.poses.robot.length > 0) {
+          let robotPose: Pose3d = this.command.poses.robot[0];
+          this.fixedCameraGroup.position.set(...robotPose.translation);
+          this.fixedCameraGroup.rotation.setFromQuaternion(rotation3dToQuaternion(robotPose.rotation));
+          this.fixedCameraObj.position.set(...config.position);
+          this.fixedCameraObj.rotation.setFromQuaternion(
+            getQuaternionFromRotSeq(config.rotations).multiply(this.CAMERA_ROTATION)
+          );
+          referenceObj = this.fixedCameraObj;
+        }
+        if (referenceObj) {
+          this.camera.position.copy(referenceObj.getWorldPosition(new THREE.Vector3()));
+          this.camera.rotation.setFromQuaternion(referenceObj.getWorldQuaternion(new THREE.Quaternion()));
+        }
+        // Update camera FOV
+        if (fov !== this.camera.fov) {
+          this.camera.fov = fov;
+          this.camera.updateProjectionMatrix();
+        }
 
-      // Update camera position
-      let referenceObj: THREE.Object3D | null = null;
-      if (this.command.poses.cameraOverride.length > 0) {
-        let cameraPose: Pose3d = this.command.poses.cameraOverride[0];
-        this.fixedCameraOverrideObj.position.set(...cameraPose.translation);
-        this.fixedCameraOverrideObj.rotation.setFromQuaternion(
-          rotation3dToQuaternion(cameraPose.rotation).multiply(this.CAMERA_ROTATION)
-        );
-        referenceObj = this.fixedCameraOverrideObj;
-      } else if (this.command.poses.robot.length > 0) {
-        let robotPose: Pose3d = this.command.poses.robot[0];
-        this.fixedCameraGroup.position.set(...robotPose.translation);
-        this.fixedCameraGroup.rotation.setFromQuaternion(rotation3dToQuaternion(robotPose.rotation));
-        this.fixedCameraObj.position.set(...cameraConfig.position);
-        this.fixedCameraObj.rotation.setFromQuaternion(
-          getQuaternionFromRotSeq(cameraConfig.rotations).multiply(this.CAMERA_ROTATION)
-        );
-        referenceObj = this.fixedCameraObj;
       }
-      if (referenceObj) {
-        this.camera.position.copy(referenceObj.getWorldPosition(new THREE.Vector3()));
-        this.camera.rotation.setFromQuaternion(referenceObj.getWorldQuaternion(new THREE.Quaternion()));
-      }
-      // Update camera FOV
-      if (fov !== this.camera.fov) {
-        this.camera.fov = fov;
+
+      // Render new frame
+      const devicePixelRatio = window.devicePixelRatio * (this.mode === "low-power" ? 0.5 : 1);
+      const canvas = this.renderer.domElement;
+
+
+
+      const width = canvas.width;
+      const height = canvas.height;
+      if (canvas.width / devicePixelRatio !== width || canvas.height / devicePixelRatio !== height) {
+        this.renderer.setSize(width, height, false);
+        this.camera.aspect = width / height;
         this.camera.updateProjectionMatrix();
+        const resolution = new THREE.Vector2(width, height);
+        this.trajectories.forEach((line) => {
+          line.material.resolution = resolution;
+        });
+        this.visionTargets.forEach((line) => {
+          line.material.resolution = resolution;
+        });
       }
-
-    }
-
-    // Render new frame
-    const devicePixelRatio = window.devicePixelRatio * (this.mode === "low-power" ? 0.5 : 1);
-    const canvas = this.renderer.domElement;
-
+      this.scene.background = isDark ? new THREE.Color("#222222") : new THREE.Color("#ffffff");
+      this.renderer.setPixelRatio(devicePixelRatio);
+      this.renderer.render(this.scene, this.camera);
+      this.lastRenders[index] = this.renderer.domElement;
+    });
 
 
-    const width = canvas.width;
-    const height = canvas.height;
-    if (canvas.width / devicePixelRatio !== width || canvas.height / devicePixelRatio !== height) {
-      this.renderer.setSize(width, height, false);
-      this.camera.aspect = width / height;
-      this.camera.updateProjectionMatrix();
-      const resolution = new THREE.Vector2(width, height);
-      this.trajectories.forEach((line) => {
-        line.material.resolution = resolution;
-      });
-      this.visionTargets.forEach((line) => {
-        line.material.resolution = resolution;
-      });
-    }
-    this.scene.background = isDark ? new THREE.Color("#222222") : new THREE.Color("#ffffff");
-    this.renderer.setPixelRatio(devicePixelRatio);
-    this.renderer.render(this.scene, this.camera);
-    this.lastRender = this.renderer.domElement;
 
 
 
