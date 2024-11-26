@@ -137,7 +137,7 @@ export default class ThreeDimensionVisualizer implements Visualizer {
     this.canvas = document.createElement("canvas");
     // NOTE the render size will be dependent on size of the first camera config, not an issue since all cameras are 640x480
     let width = cameraConfigs[0].resolution[0];
-    let height = cameraConfigs[0].resolution[0];
+    let height = cameraConfigs[0].resolution[1];
     this.canvas.width = width;
     this.canvas.height = height;
 
@@ -1346,7 +1346,7 @@ export default class ThreeDimensionVisualizer implements Visualizer {
     this.cameraConfigs.forEach((config, index) => {
       let aspectRatio = this.canvas.width / this.canvas.height;;
       if (robotConfig) {
-        console.log(config)
+        // console.log(config)
         // Get fixed aspect ratio and FOV
         this.lastAspectRatio = aspectRatio;
         let fov = config.fov / aspectRatio;
