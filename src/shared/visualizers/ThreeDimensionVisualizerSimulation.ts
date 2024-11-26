@@ -124,7 +124,7 @@ export default class ThreeDimensionVisualizer implements Visualizer {
   private lastAssetsString: string = "";
   private lastFieldTitle: string = "";
   private lastRobotTitle: string = "";
-  private lastRenders: HTMLCanvasElement[];
+  private lastRenders: HTMLCanvasElement[] = [];
 
 
   constructor(
@@ -136,9 +136,18 @@ export default class ThreeDimensionVisualizer implements Visualizer {
     this.robotConfig = robotConfig;
     this.canvas = document.createElement("canvas");
     // NOTE the render size will be dependent on size of the first camera config, not an issue since all cameras are 640x480
-    this.canvas.width = cameraConfigs[0].resolution[0]
-    this.canvas.height = cameraConfigs[0].resolution[1]
+    let width = cameraConfigs[0].resolution[0];
+    let height = cameraConfigs[0].resolution[0];
+    this.canvas.width = width;
+    this.canvas.height = height;
+
     this.lastRenders = new Array(cameraConfigs.length)
+    for (let i = 0; i < cameraConfigs.length; i++) {
+      let newCanvas = document.createElement("canvas");
+      newCanvas.width = width;
+      newCanvas.height = height;
+      this.lastRenders[i] = newCanvas;
+    }
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.canvas,
       powerPreference: mode === "cinematic" ? "high-performance" : mode === "low-power" ? "low-power" : "default"
@@ -1337,6 +1346,7 @@ export default class ThreeDimensionVisualizer implements Visualizer {
     this.cameraConfigs.forEach((config, index) => {
       let aspectRatio = this.canvas.width / this.canvas.height;;
       if (robotConfig) {
+        console.log(config)
         // Get fixed aspect ratio and FOV
         this.lastAspectRatio = aspectRatio;
         let fov = config.fov / aspectRatio;
@@ -1397,7 +1407,8 @@ export default class ThreeDimensionVisualizer implements Visualizer {
       this.scene.background = isDark ? new THREE.Color("#222222") : new THREE.Color("#ffffff");
       this.renderer.setPixelRatio(devicePixelRatio);
       this.renderer.render(this.scene, this.camera);
-      this.lastRenders[index] = this.renderer.domElement;
+      let lastRenderCtx = this.lastRenders[index].getContext("2d");
+      lastRenderCtx?.drawImage(this.renderer.domElement, 0, 0);
     });
 
 

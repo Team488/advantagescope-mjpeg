@@ -40,7 +40,7 @@ export default abstract class TimelineVizController implements TabController {
   private lastAllKeys: string[] = [];
   private periodicInterval: number;
   protected visualizer: Visualizer;
-  private simulationVisualizer: ThreeDimensionVisualizerSimulation;
+  private simulationVisualizer: ThreeDimensionVisualizerSimulation | null = null;
   private lastStreamVisualizerNames: string[] = [];
 
   constructor(
@@ -507,7 +507,7 @@ export default abstract class TimelineVizController implements TabController {
 
     // Update visualizers
     if (!this.CONTENT.hidden) this.visualizer.render(command);
-    this.simulationVisualizer.render(command);
+    this.simulationVisualizer?.render(command);
 
     window.sendMainMessage("update-satellite", {
       uuid: this.UUID,
