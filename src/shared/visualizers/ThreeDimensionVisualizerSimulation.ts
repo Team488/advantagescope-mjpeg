@@ -438,7 +438,7 @@ export default class ThreeDimensionVisualizer implements Visualizer {
       this.ghostMaterials[name] = new THREE.MeshPhongMaterial({
         color: color,
         transparent: true,
-        opacity: 0.35,
+        opacity: 1,
         specular: this.MATERIAL_SPECULAR,
         shininess: this.MATERIAL_SHININESS
       });
@@ -936,12 +936,12 @@ export default class ThreeDimensionVisualizer implements Visualizer {
           // Create ghosts and add to groups
           ThreeDimensionVisualizer.GHOST_COLORS.forEach((color) => {
             let ghostScene = originalScene.clone(true);
-            ghostScene.traverse((node: any) => {
-              let mesh = node as THREE.Mesh; // Traverse function returns Object3d or Mesh
-              if (mesh.isMesh) {
-                mesh.material = this.ghostMaterials[color].clone();
-              }
-            });
+            // ghostScene.traverse((node: any) => {
+            //   let mesh = node as THREE.Mesh; // Traverse function returns Object3d or Mesh
+            //   if (mesh.isMesh) {
+            //     mesh.material = this.ghostMaterials[color].clone();
+            //   }
+            // });
 
             if (index === 0) {
               // Root model, set position and add directly

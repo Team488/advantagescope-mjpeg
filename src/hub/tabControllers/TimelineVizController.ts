@@ -142,12 +142,13 @@ export default abstract class TimelineVizController implements TabController {
   // stream visualizers are to stream
   createStreamVisualizers() {
     try {
-      let robotConfig = window.assets?.robots.find((robotData) => robotData.name === "KitBot");
-      if (robotConfig === undefined) {
+      let robotConfigCamera = window.assets?.robots.find((robotData) => robotData.name === "KitBot");
+      let robotConfig = window.assets?.robots.find((robotData) => robotData.name === "Presto");
+      if (robotConfig === undefined || robotConfigCamera === undefined) {
         window.electronAPI.log("Error cannot load config!");
         return;
       }
-      let names = robotConfig.cameras.map((camera) => camera.name);
+      let names = robotConfigCamera.cameras.map((camera) => camera.name);
       if (this.areArraysEqual(this.lastStreamVisualizerNames, names)) {
         // no changes so dont need to update visualizers
         window.electronAPI.log("Not Creating stream visualizers");
@@ -156,7 +157,7 @@ export default abstract class TimelineVizController implements TabController {
       window.electronAPI.log("Creating stream visualizers");
       // create new visualizers
 
-      this.simulationVisualizer = new ThreeDimensionVisualizerSimulation("standard", robotConfig, robotConfig.cameras)
+      this.simulationVisualizer = new ThreeDimensionVisualizerSimulation("standard", robotConfig, robotConfigCamera.cameras)
       window.electronAPI.updateNetworkStreamNames(names);
     } catch (error) {
       window.electronAPI.log("Failing to create stream visualizers!\n" + error);
