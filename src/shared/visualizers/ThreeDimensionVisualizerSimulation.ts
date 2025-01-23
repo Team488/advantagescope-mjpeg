@@ -191,7 +191,7 @@ export default class ThreeDimensionVisualizer implements Visualizer {
 
     // Add lights
     {
-      const light = new THREE.HemisphereLight(0xffffff, 0x444444, mode === "cinematic" ? 0.5 : 2);
+      const light = new THREE.HemisphereLight(0xffffff, 0x444444, 2);
       this.scene.add(light);
     }
     if (mode !== "cinematic") {
@@ -204,7 +204,7 @@ export default class ThreeDimensionVisualizer implements Visualizer {
         [6, -3, 6, 2],
         [-6, -3, -6, 2]
       ].forEach(([x, y, targetX, targetY]) => {
-        const light = new THREE.SpotLight(0xffffff, 150, 0, 50 * (Math.PI / 180), 0.2, 2);
+        const light = new THREE.SpotLight(0xffffff, 200, 0, 50 * (Math.PI / 180), 0.2, 2);
         light.position.set(x, y, 8);
         light.target.position.set(targetX, targetY, 0);
         light.castShadow = true;
@@ -214,12 +214,12 @@ export default class ThreeDimensionVisualizer implements Visualizer {
         this.wpilibCoordinateGroup.add(light, light.target);
       });
       {
-        const light = new THREE.PointLight(0xff0000, 60);
+        const light = new THREE.PointLight(0xff0000, 100);
         light.position.set(4.5, 0, 5);
         this.wpilibCoordinateGroup.add(light);
       }
       {
-        const light = new THREE.PointLight(0x0000ff, 60);
+        const light = new THREE.PointLight(0x0000ff, 100);
         light.position.set(-4.5, 0, 5);
         this.wpilibCoordinateGroup.add(light);
       }

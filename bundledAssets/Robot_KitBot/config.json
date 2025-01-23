@@ -23,7 +23,7 @@
       ],
       "position": [0.3500106, 0.3527338, 0.2729096],
       "resolution": [640, 480],
-      "fov": 70
+      "fov": 55
     },
     {
       "name": "Robot FrontRight Camera",
@@ -39,7 +39,7 @@
       ],
       "position": [0.3500106, -0.3527338, 0.2729096],
       "resolution": [640, 480],
-      "fov": 70
+      "fov": 55
     },
     {
       "name": "Robot RearLeft Camera",
@@ -55,7 +55,7 @@
       ],
       "position": [-0.3331024, 0.3265042, 0.267208],
       "resolution": [640, 480],
-      "fov": 70
+      "fov": 55
     },
     {
       "name": "Robot RearRight Camera",
@@ -71,7 +71,7 @@
       ],
       "position": [-0.3331024, -0.3265042, 0.267208],
       "resolution": [640, 480],
-      "fov": 70
+      "fov": 55
     }
   ],
   "components": []
