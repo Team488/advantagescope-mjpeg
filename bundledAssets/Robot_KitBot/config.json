@@ -10,66 +10,14 @@
   "position": [0.12, 3.15, 0],
   "cameras": [
     {
-      "name": "Robot FrontLeft Camera",
+      "name": "Robot FrontRight CameraAT",
       "rotations": [
         {
           "axis": "y",
-          "degrees": -3
-        },
-        {
-          "axis": "z",
-          "degrees": 80
+          "degrees": -21
         }
       ],
-      "position": [0.3500106, 0.3527338, 0.2729096],
-      "resolution": [640, 480],
-      "fov": 55
-    },
-    {
-      "name": "Robot FrontRight Camera",
-      "rotations": [
-        {
-          "axis": "y",
-          "degrees": -3
-        },
-        {
-          "axis": "z",
-          "degrees": 280
-        }
-      ],
-      "position": [0.3500106, -0.3527338, 0.2729096],
-      "resolution": [640, 480],
-      "fov": 55
-    },
-    {
-      "name": "Robot RearLeft Camera",
-      "rotations": [
-        {
-          "axis": "z",
-          "degrees": 215
-        },
-        {
-          "axis": "y",
-          "degrees": -3.77
-        }
-      ],
-      "position": [-0.3331024, 0.3265042, 0.267208],
-      "resolution": [640, 480],
-      "fov": 55
-    },
-    {
-      "name": "Robot RearRight Camera",
-      "rotations": [
-        {
-          "axis": "z",
-          "degrees": 145
-        },
-        {
-          "axis": "y",
-          "degrees": -3.77
-        }
-      ],
-      "position": [-0.3331024, -0.3265042, 0.267208],
+      "position": [0.3575, -0.1659, 0.1701],
       "resolution": [640, 480],
       "fov": 55
     }

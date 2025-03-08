@@ -1,0 +1,118 @@
+{
+  "name": "KitBot",
+  "sourceUrl": "https://cad.onshape.com/documents/eeba08a27f462f02e601684e/w/0f61d86476db9c2997f2f9e2/e/d3543ebb4bf93b5d352a38fe",
+  "rotations": [
+    {
+      "axis": "z",
+      "degrees": 90
+    }
+  ],
+  "position": [0.12, 3.15, 0],
+  "cameras": [
+    {
+      "name": "Robot FrontLeft Camera",
+      "rotations": [
+        {
+          "axis": "y",
+          "degrees": -3
+        },
+        {
+          "axis": "z",
+          "degrees": 80
+        }
+      ],
+      "position": [0.3500106, 0.3527338, 0.2729096],
+      "resolution": [640, 480],
+      "fov": 55
+    },
+    {
+      "name": "Robot FrontRight Camera",
+      "rotations": [
+        {
+          "axis": "y",
+          "degrees": -3
+        },
+        {
+          "axis": "z",
+          "degrees": 280
+        }
+      ],
+      "position": [0.3500106, -0.3527338, 0.2729096],
+      "resolution": [640, 480],
+      "fov": 55
+    },
+    {
+      "name": "Robot RearLeft Camera",
+      "rotations": [
+        {
+          "axis": "z",
+          "degrees": 215
+        },
+        {
+          "axis": "y",
+          "degrees": -3.77
+        }
+      ],
+      "position": [-0.3331024, 0.3265042, 0.267208],
+      "resolution": [640, 480],
+      "fov": 55
+    },
+    {
+      "name": "Robot RearRight Camera",
+      "rotations": [
+        {
+          "axis": "z",
+          "degrees": 145
+        },
+        {
+          "axis": "y",
+          "degrees": -3.77
+        }
+      ],
+      "position": [-0.3331024, -0.3265042, 0.267208],
+      "resolution": [640, 480],
+      "fov": 55
+    },
+    {
+      "name": "Robot ATFrontRight Camera",
+      "rotations": [
+        {
+          "axis": "y",
+          "degrees": -12
+        }
+      ],
+      "position": [0.26035, -0.1651, 0.1778],
+      "resolution": [640, 480],
+      "fov": 55
+    },
+    {
+      "name": "Robot ATFrontLeft Camera",
+      "rotations": [
+        {
+          "axis": "y",
+          "degrees": -12
+        }
+      ],
+      "position": [0.26035, 0.1651, 0.1778],
+      "resolution": [640, 480],
+      "fov": 55
+    },
+    {
+      "name": "Robot ATBack Camera",
+      "rotations": [
+        {
+          "axis": "y",
+          "degrees": -45
+        },
+        {
+          "axis": "z",
+          "degrees": 180
+        }
+      ],
+      "position": [-0.26035, 0, 0.1778],
+      "resolution": [640, 480],
+      "fov": 55
+    }
+  ],
+  "components": []
+}

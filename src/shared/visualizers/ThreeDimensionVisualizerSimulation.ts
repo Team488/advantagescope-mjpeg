@@ -549,25 +549,31 @@ export default class ThreeDimensionVisualizer implements Visualizer {
         if (this.lastRenders[index] != null) {
           // console.log("Sending render");
 
-          const newCanvas = document.createElement("canvas");
-          newCanvas.width = this.renderer.domElement.width;
-          newCanvas.height = this.renderer.domElement.height;
+          // const newCanvas = document.createElement("canvas");
+          // newCanvas.width = this.renderer.domElement.width;
+          // newCanvas.height = this.renderer.domElement.height;
 
-          // Get the 2D context of the new canvas
-          const newctx = newCanvas.getContext("2d");
+          // // Get the 2D context of the new canvas
+          // const newctx = newCanvas.getContext("2d");
 
           // Fill the new canvas with a black background
-          if (newctx != null) newctx.fillStyle = "green";
-          newctx?.fillRect(0, 0, newCanvas.width, newCanvas.height);
+          // if (newctx != null) newctx.fillStyle = "green";
+          // newctx?.fillRect(0, 0, newCanvas.width, newCanvas.height);
           // console.log("Width: " + newCanvas.width + " height" + newCanvas.height)
           // newctx?.fillText("AAAAAAAAAA", 30, 30, 2);
           // Draw the original canvas content onto the new canvas
-          newctx?.drawImage(this.lastRenders[index], 0, 0);
+          var canvas = this.lastRenders[index]
           // console.log("Sending frame!!");
-          const dataUrl = newCanvas.toDataURL("image/jpeg"); // Data URL
-          const base64Data = dataUrl.split(",")[1]; // Extract the base64 string
-          // window.electronAPI.log("Sending b64: " + base64Data);
-          window.electronAPI.sendFrameToMain(name, base64Data); // Send byte array
+          const pixels = canvas?.getContext("2d")?.getImageData(0, 0, canvas.width, canvas.height).data;
+
+          // Check if all pixels are transparent (RGBA all zeros)
+          if (pixels?.some((value, index) => index % 4 !== 3 && value !== 0)) {
+            const dataUrl = this.lastRenders[index].toDataURL("image/jpeg"); // Data URL
+            const base64Data = dataUrl.split(",")[1]; // Extract the base64 string
+            // window.electronAPI.log("Sending b64: " + base64Data);
+            window.electronAPI.sendFrameToMain(name, base64Data); // Send byte array
+          }
+
         }
 
       } catch (error) {

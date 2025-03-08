@@ -157,7 +157,7 @@ export default abstract class TimelineVizController implements TabController {
       window.electronAPI.log("Creating stream visualizers");
       // create new visualizers
 
-      this.simulationVisualizer = new ThreeDimensionVisualizerSimulation("cinematic", robotConfig, robotConfigCamera.cameras)
+      this.simulationVisualizer = new ThreeDimensionVisualizerSimulation("standard", robotConfig, robotConfigCamera.cameras)
       window.electronAPI.updateNetworkStreamNames(names);
     } catch (error) {
       window.electronAPI.log("Failing to create stream visualizers!\n" + error);
